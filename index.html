@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>FORGE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0c;
+    --card: #141418;
+    --border: #1e1e24;
+    --accent: #c8ff00;
+    --accent-dim: #3a4d00;
+    --swim: #00b4d8;
+    --text: #e8e8e8;
+    --dim: #666;
+    --danger: #e74c3c;
+    --green: #2ecc40;
+    --amber: #f5a623;
+    --red: #e74c3c;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.4;
+    overscroll-behavior: none;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+  }
+
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 16px 120px;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .header {
+    padding: 20px 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo { font-size: 20px; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .big-num { font-size: 28px; font-weight: 800; line-height: 1; }
+
+  .btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
+    transition: opacity 0.15s;
+  }
+  .btn:active { opacity: 0.8; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-small {
+    padding: 8px 12px;
+    font-size: 11px;
+    width: auto;
+  }
+
+  input[type="number"], input[type="text"] {
+    background: #1a1a20;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 9px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  input:focus { border-color: var(--accent); }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .progress-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .exercise-card { transition: opacity 0.2s; }
+
+  .set-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .set-num {
+    font-size: 11px;
+    color: var(--dim);
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .check-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .check-btn.done { border-color: var(--accent); background: rgba(200,255,0,0.12); }
+  .check-btn.done-swim { border-color: var(--swim); background: rgba(0,180,216,0.12); }
+
+  .session-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text);
+    text-align: left;
+    width: 100%;
+    transition: background 0.15s;
+  }
+  .session-btn:active { background: rgba(255,255,255,0.03); }
+  .session-btn.completed { opacity: 0.45; }
+
+  .quick-btns { display: flex; gap: 8px; margin-bottom: 16px; }
+  .quick-btn {
+    flex: 1;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 6px;
+    font-weight: 700;
+    font-size: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    letter-spacing: 0.3px;
+    transition: opacity 0.15s;
+  }
+  .quick-btn:active { opacity: 0.8; }
+
+  .log-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .recovery-strip {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .metric-box { text-align: center; }
+  .metric-val { font-weight: 700; font-size: 15px; }
+  .metric-label { font-size: 9px; color: var(--dim); letter-spacing: 1px; margin-top: 2px; }
+
+  .trends-row { display: flex; justify-content: space-around; margin-top: 8px; }
+
+  .plan-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+  .plan-btn {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--dim);
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .plan-btn.active {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .warmup-block {
+    border-left: 3px solid var(--dim);
+    padding: 10px 14px;
+  }
+  .swim-block {
+    border-left: 3px solid var(--swim);
+    padding: 10px 14px;
+  }
+
+  .sync-section {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--dim);
+    padding: 32px 16px;
+  }
+
+  .del-btn {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .hidden { display: none; }
+
+  input[type="file"] { display: none; }
+
+  .menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .menu-sheet {
+    background: var(--card);
+    border-radius: 16px 16px 0 0;
+    padding: 24px 20px;
+    padding-bottom: calc(24px + var(--safe-bottom));
+    width: 100%;
+    max-width: 480px;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    width: 100%;
+    text-align: left;
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item svg { color: var(--dim); }
+
+  @media (prefers-color-scheme: light) {
+    /* keep dark — this is a gym app */
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ─── ICONS (SVG strings) ───
+const ICO = {
+  dumbbell: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5h11M6.5 17.5h11M3 10V6.5a1 1 0 011-1h1.5M3 14v3.5a1 1 0 001 1h1.5M21 10V6.5a1 1 0 00-1-1h-1.5M21 14v3.5a1 1 0 01-1 1h-1.5M6.5 5.5v13M17.5 5.5v13"/></svg>`,
+  waves: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6c1.5 0 2.5 2 4 2s2.5-2 4-2 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2M2 12c1.5 0 2.5 2 4 2s2.5-2 4-2 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2M2 18c1.5 0 2.5 2 4 2s2.5-2 4-2 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2"/></svg>`,
+  heart: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>`,
+  moon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
+  zap: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  chevLeft: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>`,
+  upload: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>`,
+  trash: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>`,
+  calendar: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  download: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="8 12 12 16 16 12"/><line x1="12" y1="16" x2="12" y2="3"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>`,
+  menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>`,
+  sync: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>`,
+};
+
+// ─── PROGRAMME ───
+const PROGRAMME = {
+  "Strength A – Lower Body Primary": {
+    type: "strength",
+    warmup: "8 min gradual: bike/walk → bodyweight squats → leg swings → 90/90 hip switches",
+    exercises: [
+      { name: "Barbell Back Squat", sets: 4, reps: "6-8", id: "squat" },
+      { name: "Romanian Deadlift", sets: 3, reps: "8-10", id: "rdl" },
+      { name: "Bulgarian Split Squat", sets: 3, reps: "8 each", id: "bss" },
+      { name: "Calf Raises (weighted)", sets: 3, reps: "12-15", id: "calf" },
+      { name: "Farmer's Carries", sets: 3, reps: "30-40m", id: "carry" },
+    ],
+    cooldown: "5 min: couch stretch, pigeon, bar hang",
+  },
+  "Strength B – Lower + Upper": {
+    type: "strength",
+    warmup: "8 min gradual: bike/walk → bodyweight squats → leg swings → 90/90 hip switches",
+    exercises: [
+      { name: "Trap Bar Deadlift", sets: 4, reps: "5-6", id: "deadlift" },
+      { name: "Walking Lunges (weighted)", sets: 3, reps: "10 each", id: "lunge" },
+      { name: "Pull-ups / Lat Pulldown", sets: 3, reps: "6-10", id: "pull" },
+      { name: "DB Overhead Press", sets: 3, reps: "8-10", id: "ohp" },
+      { name: "Pallof Press / Dead Bug", sets: 3, reps: "10 each", id: "core" },
+    ],
+    cooldown: "7 min: hip flexor stretch, t-spine rotation, 90s hang",
+  },
+  "Swim Session": {
+    type: "swim",
+    exercises: [
+      { name: "Warm-up (easy freestyle)", sets: 1, reps: "400m", id: "sw_warm" },
+      { name: "Main Set (mixed strokes)", sets: 1, reps: "1600-2000m", id: "sw_main" },
+      { name: "Cool-down (backstroke)", sets: 1, reps: "200m", id: "sw_cool" },
+    ],
+    notes: "Post-swim sauna: 2-3 rounds × 10-15 min at 80-85°C. Enter gradually.",
+  },
+};
+
+const WEEK_TEMPLATES = {
+  "3": ["Strength A – Lower Body Primary", "Swim Session", "Strength B – Lower + Upper"],
+  "4": ["Strength A – Lower Body Primary", "Swim Session", "Strength B – Lower + Upper", "Swim Session"],
+};
+
+// ─── STATE ───
+let state = {
+  view: "dashboard",
+  logs: [],
+  whoopData: [],
+  activeSession: null,
+  sessionLog: {},
+  weekPlan: "4",
+  menuOpen: false,
+};
+
+// ─── STORAGE ───
+function load(k, fb) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : fb; } catch { return fb; } }
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+function init() {
+  state.logs = load("forge-logs", []);
+  state.whoopData = load("forge-whoop", []);
+  render();
+}
+
+function persist() {
+  save("forge-logs", state.logs);
+  save("forge-whoop", state.whoopData);
+}
+
+// ─── HELPERS ───
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function todayISO() { return new Date().toISOString().slice(0, 10); }
+function fmtDate(d) { return new Date(d).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }); }
+function recovColor(v) { if (v == null) return "var(--dim)"; if (v >= 67) return "var(--green)"; if (v >= 34) return "var(--amber)"; return "var(--red)"; }
+
+function getWeekLogs() {
+  const now = new Date();
+  const ws = new Date(now);
+  ws.setDate(now.getDate() - now.getDay() + 1);
+  ws.setHours(0,0,0,0);
+  return state.logs.filter(l => new Date(l.date) >= ws);
+}
+
+// ─── WHOOP CSV ───
+function parseWhoop(text) {
+  const lines = text.split("\n").filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const h = lines[0].split(",").map(x => x.trim().toLowerCase().replace(/['"]/g, ""));
+  const fi = (test) => h.findIndex(x => test(x));
+  const di = fi(x => x.includes("date") || x.includes("day"));
+  const hi = fi(x => x.includes("hrv"));
+  const ri = fi(x => x.includes("resting") && x.includes("heart"));
+  const si = fi(x => x.includes("sleep") && (x.includes("hour") || x.includes("duration") || x.includes("performance")));
+  const rci = fi(x => x.includes("recovery"));
+  const sti = fi(x => x.includes("strain"));
+  return lines.slice(1).map(line => {
+    const c = line.split(",").map(x => x.trim().replace(/['"]/g, ""));
+    const e = {};
+    if (di >= 0) e.date = c[di];
+    if (hi >= 0) e.hrv = parseFloat(c[hi]) || null;
+    if (ri >= 0) e.rhr = parseFloat(c[ri]) || null;
+    if (si >= 0) e.sleep = parseFloat(c[si]) || null;
+    if (rci >= 0) e.recovery = parseFloat(c[rci]) || null;
+    if (sti >= 0) e.strain = parseFloat(c[sti]) || null;
+    return e;
+  }).filter(e => e.date);
+}
+
+// ─── SPARKLINE ───
+function sparkSVG(data, color, w=80, h=28) {
+  const vals = data.filter(v => v != null);
+  if (vals.length < 2) return "";
+  const mn = Math.min(...vals), mx = Math.max(...vals), rng = mx - mn || 1;
+  const pts = vals.map((v, i) => {
+    const x = (i / (vals.length - 1)) * w;
+    const y = h - ((v - mn) / rng) * (h - 4) - 2;
+    return `${x},${y}`;
+  }).join(" ");
+  const last = vals[vals.length - 1];
+  const ly = h - ((last - mn) / rng) * (h - 4) - 2;
+  return `<svg width="${w}" height="${h}" style="display:block"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${w}" cy="${ly}" r="2.5" fill="${color}"/></svg>`;
+}
+
+// ─── EXPORT / IMPORT ───
+function exportData() {
+  const payload = { logs: state.logs, whoopData: state.whoopData, exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `forge-backup-${todayISO()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  state.menuOpen = false;
+  render();
+}
+
+function importData() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
+  input.onchange = (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const d = JSON.parse(ev.target.result);
+        if (d.logs) {
+          // Merge: add any logs with IDs we don't have
+          const existingIds = new Set(state.logs.map(l => l.id));
+          const newLogs = d.logs.filter(l => !existingIds.has(l.id));
+          state.logs = [...newLogs, ...state.logs].sort((a, b) => b.date.localeCompare(a.date));
+        }
+        if (d.whoopData && d.whoopData.length > state.whoopData.length) {
+          state.whoopData = d.whoopData;
+        }
+        persist();
+        state.menuOpen = false;
+        render();
+      } catch { alert("Couldn't read that file. Make sure it's a FORGE backup JSON."); }
+    };
+    reader.readAsText(f);
+  };
+  input.click();
+  state.menuOpen = false;
+}
+
+// ─── SESSION LOGIC ───
+function startSession(name) {
+  state.activeSession = name;
+  const prog = PROGRAMME[name];
+  const sl = {};
+  prog.exercises.forEach(ex => {
+    // Pre-fill weight from last session of same type
+    const lastLog = state.logs.find(l => l.session === name && l.exercises && l.exercises[ex.id]);
+    sl[ex.id] = Array.from({ length: ex.sets }, (_, i) => {
+      const prev = lastLog?.exercises?.[ex.id]?.[i];
+      return { weight: prev?.weight || "", reps: prev?.reps || "", done: false };
+    });
+  });
+  state.sessionLog = sl;
+  state.view = "session";
+  render();
+  window.scrollTo(0, 0);
+}
+
+function saveSession() {
+  const latest = state.whoopData.length ? state.whoopData[state.whoopData.length - 1] : null;
+  state.logs.unshift({
+    id: genId(),
+    date: todayISO(),
+    session: state.activeSession,
+    type: PROGRAMME[state.activeSession].type,
+    exercises: JSON.parse(JSON.stringify(state.sessionLog)),
+    whoopSnapshot: latest,
+  });
+  persist();
+  state.view = "dashboard";
+  state.activeSession = null;
+  render();
+}
+
+function deleteLog(id) {
+  state.logs = state.logs.filter(l => l.id !== id);
+  persist();
+  render();
+}
+
+// ─── RENDER ───
+function render() {
+  const app = document.getElementById("app");
+  if (state.view === "dashboard") app.innerHTML = renderDashboard();
+  else if (state.view === "session") app.innerHTML = renderSession();
+  bindEvents();
+}
+
+function renderDashboard() {
+  const latest = state.whoopData.length ? state.whoopData[state.whoopData.length - 1] : null;
+  const recent7 = state.whoopData.slice(-7);
+  const weekLogs = getWeekLogs();
+  const plan = WEEK_TEMPLATES[state.weekPlan];
+
+  let html = `
+    <div class="header">
+      <div class="logo">FORGE</div>
+      <button class="btn-outline btn-small" onclick="document.getElementById('whoop-file').click()">
+        ${ICO.upload} Whoop CSV
+      </button>
+      <button class="btn-outline btn-small" style="padding:8px 10px" data-action="menu">${ICO.menu}</button>
+      <input type="file" id="whoop-file" accept=".csv" data-action="whoop-upload">
+    </div>`;
+
+  // Menu overlay
+  if (state.menuOpen) {
+    html += `
+    <div class="menu-overlay" data-action="close-menu">
+      <div class="menu-sheet" onclick="event.stopPropagation()">
+        <span class="label">Sync Between Devices</span>
+        <button class="menu-item" data-action="export">${ICO.download} Export Backup (JSON)</button>
+        <button class="menu-item" data-action="import">${ICO.sync} Import Backup</button>
+        <button class="menu-item" onclick="document.getElementById('whoop-file').click();state.menuOpen=false;render();">${ICO.upload} Upload Whoop CSV</button>
+      </div>
+    </div>`;
+  }
+
+  // Recovery strip
+  if (latest) {
+    const rc = recovColor(latest.recovery);
+    html += `
+    <div class="card recovery-strip">
+      <div style="flex:1">
+        <span class="label">Recovery</span>
+        <div class="big-num" style="color:${rc}">${latest.recovery != null ? Math.round(latest.recovery) + '%' : '—'}</div>
+      </div>
+      <div style="display:flex;gap:16px">
+        ${[
+          { ico: ICO.heart, val: latest.hrv, u: "ms", l: "HRV" },
+          { ico: ICO.zap, val: latest.rhr, u: "bpm", l: "RHR" },
+          { ico: ICO.moon, val: latest.sleep, u: "h", l: "SLEEP" },
+        ].map(m => `
+          <div class="metric-box">
+            <div style="color:var(--dim);margin-bottom:4px">${m.ico}</div>
+            <div class="metric-val">${m.val != null ? Math.round(m.val * 10) / 10 : '—'}</div>
+            <div class="metric-label">${m.l}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>`;
+  }
+
+  // Trends
+  if (recent7.length >= 3) {
+    html += `
+    <div class="card">
+      <span class="label">7-Day Trends</span>
+      <div class="trends-row">
+        ${[
+          { l: "HRV", d: recent7.map(x => x.hrv), c: "#c8ff00" },
+          { l: "RHR", d: recent7.map(x => x.rhr), c: "#00b4d8" },
+          { l: "SLEEP", d: recent7.map(x => x.sleep), c: "#a78bfa" },
+        ].map(t => `
+          <div style="text-align:center">
+            ${sparkSVG(t.d, t.c)}
+            <div style="font-size:9px;color:var(--dim);margin-top:4px;letter-spacing:1px">${t.l}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>`;
+  }
+
+  // Week plan
+  html += `
+  <div class="card">
+    <span class="label">This Week's Plan</span>
+    <div class="plan-toggle">
+      ${["3", "4"].map(p => `
+        <button class="plan-btn ${state.weekPlan === p ? 'active' : ''}" data-plan="${p}">${p} sessions</button>
+      `).join("")}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${plan.map((name, i) => {
+        const done = weekLogs.some(l => l.session === name);
+        const prog = PROGRAMME[name];
+        const isSwim = prog.type === "swim";
+        const color = isSwim ? "var(--swim)" : "var(--accent)";
+        return `
+        <button class="session-btn ${done ? 'completed' : ''}" data-start="${name}" ${done ? '' : ''}>
+          <div style="color:${color};flex-shrink:0">${isSwim ? ICO.waves : ICO.dumbbell}</div>
+          <div style="flex:1;font-size:12px;font-weight:600">${name}</div>
+          ${done ? `<div style="color:${color}">${ICO.check}</div>` : ''}
+        </button>`;
+      }).join("")}
+    </div>
+  </div>`;
+
+  // Quick start
+  html += `<div class="quick-btns">`;
+  Object.keys(PROGRAMME).forEach(name => {
+    const isSwim = PROGRAMME[name].type === "swim";
+    const bg = isSwim ? "var(--swim)" : "var(--accent)";
+    const label = name.split("–")[0].trim().replace("Strength ", "");
+    html += `<button class="quick-btn" style="background:${bg};color:var(--bg)" data-start="${name}">
+      ${isSwim ? ICO.waves : ICO.dumbbell} ${label}
+    </button>`;
+  });
+  html += `</div>`;
+
+  // Log
+  html += `<span class="label">Training Log</span>`;
+  if (!state.logs.length) {
+    html += `<div class="card empty-state">No sessions logged yet. Start your first workout above.</div>`;
+  } else {
+    state.logs.slice(0, 20).forEach(log => {
+      const isSwim = log.type === "swim";
+      const color = isSwim ? "var(--swim)" : "var(--accent)";
+      const totalSets = log.exercises ? Object.values(log.exercises).flat().filter(s => s.done).length : 0;
+      const recSnap = log.whoopSnapshot?.recovery;
+      html += `
+      <div class="card log-entry">
+        <div style="color:${color};flex-shrink:0">${isSwim ? ICO.waves : ICO.dumbbell}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:12px;margin-bottom:2px">${log.session}</div>
+          <div style="font-size:11px;color:var(--dim);display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span>${ICO.calendar} ${fmtDate(log.date)}</span>
+            ${!isSwim ? `<span>${totalSets} sets</span>` : ''}
+            ${recSnap != null ? `<span style="color:${recovColor(recSnap)}">${Math.round(recSnap)}% rec</span>` : ''}
+          </div>
+        </div>
+        <button class="del-btn" data-delete="${log.id}">${ICO.trash}</button>
+      </div>`;
+    });
+  }
+
+  // Whoop prompt if no data
+  if (!latest) {
+    html += `
+    <div class="card empty-state" style="margin-top:12px">
+      ${ICO.upload}
+      <div style="margin-top:8px;font-size:12px">Export Whoop data as CSV and upload to see recovery alongside training.</div>
+      <button class="btn-outline" style="margin-top:12px;justify-content:center" onclick="document.getElementById('whoop-file').click()">
+        Upload Whoop CSV
+      </button>
+    </div>`;
+  }
+
+  return html;
+}
+
+function renderSession() {
+  const name = state.activeSession;
+  const prog = PROGRAMME[name];
+  const isSwim = prog.type === "swim";
+  const color = isSwim ? "var(--swim)" : "var(--accent)";
+  const colorHex = isSwim ? "#00b4d8" : "#c8ff00";
+  const latest = state.whoopData.length ? state.whoopData[state.whoopData.length - 1] : null;
+
+  const allSets = Object.values(state.sessionLog).flat();
+  const doneSets = allSets.filter(s => s.done).length;
+  const pct = allSets.length ? Math.round((doneSets / allSets.length) * 100) : 0;
+
+  let html = `
+  <div class="header">
+    <button class="back-btn" data-action="back">${ICO.chevLeft}</button>
+    <div style="flex:1;text-align:center">
+      <div style="font-size:14px;font-weight:800">${name}</div>
+      <div style="font-size:11px;color:var(--dim)">${fmtDate(todayISO())}</div>
+    </div>
+    <div style="width:20px"></div>
+  </div>`;
+
+  // Recovery context
+  if (latest) {
+    const rc = recovColor(latest.recovery);
+    html += `
+    <div style="display:flex;gap:12px;padding:8px 12px;border-radius:8px;margin-bottom:12px;
+      background:${rc}12;border:1px solid ${rc}22">
+      <div style="font-weight:700;color:${rc}">${latest.recovery != null ? Math.round(latest.recovery) + '%' : '—'}</div>
+      <div style="font-size:11px;color:var(--dim)">
+        HRV ${latest.hrv ? Math.round(latest.hrv) : '—'}ms · RHR ${latest.rhr ? Math.round(latest.rhr) : '—'}bpm · Sleep ${latest.sleep ? (Math.round(latest.sleep*10)/10) : '—'}h
+      </div>
+    </div>`;
+  }
+
+  // Progress
+  html += `
+  <div style="margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:11px;color:var(--dim)">${doneSets}/${allSets.length} sets</span>
+      <span style="font-size:11px;font-weight:700;color:${color}">${pct}%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>
+  </div>`;
+
+  // Warmup
+  if (prog.warmup) {
+    html += `
+    <div class="card warmup-block">
+      <span class="label" style="margin-bottom:4px">Warm-up</span>
+      <div style="font-size:12px;color:var(--dim);line-height:1.5">${prog.warmup}</div>
+    </div>`;
+  }
+
+  // Exercises
+  prog.exercises.forEach(ex => {
+    const sets = state.sessionLog[ex.id] || [];
+    html += `
+    <div class="card exercise-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-weight:700;font-size:13px">${ex.name}</span>
+        <span class="tag" style="background:${colorHex}18;color:${colorHex}">${ex.sets} × ${ex.reps}</span>
+      </div>`;
+
+    sets.forEach((set, si) => {
+      const doneClass = isSwim ? "done-swim" : "done";
+      html += `<div class="set-row" style="opacity:${set.done ? 0.45 : 1}">
+        <span class="set-num">${si + 1}</span>`;
+
+      if (!isSwim) {
+        html += `
+        <input type="number" inputmode="decimal" placeholder="kg" value="${set.weight}" 
+          style="width:68px;text-align:center" data-field="weight" data-ex="${ex.id}" data-set="${si}">
+        <input type="number" inputmode="numeric" placeholder="reps" value="${set.reps}"
+          style="width:68px;text-align:center" data-field="reps" data-ex="${ex.id}" data-set="${si}">`;
+      } else {
+        html += `
+        <input type="text" placeholder="distance / notes" value="${set.reps || ''}"
+          style="flex:1" data-field="reps" data-ex="${ex.id}" data-set="${si}">`;
+      }
+
+      html += `
+        <button class="check-btn ${set.done ? doneClass : ''}" data-toggle="${ex.id}" data-tset="${si}">
+          ${set.done ? (isSwim ? ICO.check.replace('currentColor', '#00b4d8') : ICO.check.replace('currentColor', '#c8ff00')) : ''}
+        </button>
+      </div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  // Cooldown
+  if (prog.cooldown) {
+    html += `
+    <div class="card warmup-block">
+      <span class="label" style="margin-bottom:4px">Cool-down</span>
+      <div style="font-size:12px;color:var(--dim);line-height:1.5">${prog.cooldown}</div>
+    </div>`;
+  }
+
+  // Sauna note
+  if (prog.notes) {
+    html += `
+    <div class="card swim-block">
+      <span class="label" style="margin-bottom:4px">Post-Session</span>
+      <div style="font-size:12px;color:var(--dim);line-height:1.5">${prog.notes}</div>
+    </div>`;
+  }
+
+  // Save
+  html += `
+  <button class="btn" style="margin-top:16px;background:${color};color:var(--bg)" data-action="save">
+    ${ICO.check} Complete Session
+  </button>`;
+
+  return html;
+}
+
+// ─── EVENT BINDING ───
+function bindEvents() {
+  // Plan toggle
+  document.querySelectorAll("[data-plan]").forEach(el => {
+    el.onclick = () => { state.weekPlan = el.dataset.plan; render(); };
+  });
+
+  // Start session
+  document.querySelectorAll("[data-start]").forEach(el => {
+    el.onclick = () => startSession(el.dataset.start);
+  });
+
+  // Delete log
+  document.querySelectorAll("[data-delete]").forEach(el => {
+    el.onclick = (e) => { e.stopPropagation(); deleteLog(el.dataset.delete); };
+  });
+
+  // Back
+  document.querySelectorAll('[data-action="back"]').forEach(el => {
+    el.onclick = () => { state.view = "dashboard"; render(); };
+  });
+
+  // Save
+  document.querySelectorAll('[data-action="save"]').forEach(el => {
+    el.onclick = saveSession;
+  });
+
+  // Menu
+  document.querySelectorAll('[data-action="menu"]').forEach(el => {
+    el.onclick = () => { state.menuOpen = true; render(); };
+  });
+  document.querySelectorAll('[data-action="close-menu"]').forEach(el => {
+    el.onclick = () => { state.menuOpen = false; render(); };
+  });
+  document.querySelectorAll('[data-action="export"]').forEach(el => {
+    el.onclick = exportData;
+  });
+  document.querySelectorAll('[data-action="import"]').forEach(el => {
+    el.onclick = importData;
+  });
+
+  // Set inputs
+  document.querySelectorAll("[data-field]").forEach(el => {
+    el.oninput = () => {
+      const { ex, set: si, field } = el.dataset;
+      if (state.sessionLog[ex] && state.sessionLog[ex][parseInt(si)]) {
+        state.sessionLog[ex][parseInt(si)][field] = el.value;
+      }
+    };
+  });
+
+  // Toggle set done
+  document.querySelectorAll("[data-toggle]").forEach(el => {
+    el.onclick = () => {
+      const exId = el.dataset.toggle;
+      const si = parseInt(el.dataset.tset);
+      if (state.sessionLog[exId] && state.sessionLog[exId][si]) {
+        state.sessionLog[exId][si].done = !state.sessionLog[exId][si].done;
+        render();
+      }
+    };
+  });
+
+  // Whoop upload
+  const whoopInput = document.getElementById("whoop-file");
+  if (whoopInput) {
+    whoopInput.onchange = (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const parsed = parseWhoop(ev.target.result);
+        if (parsed.length) { state.whoopData = parsed; persist(); render(); }
+      };
+      reader.readAsText(f);
+    };
+  }
+}
+
+// ─── SERVICE WORKER ───
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ─── BOOT ───
+init();
+</script>
+</body>
+</html>
